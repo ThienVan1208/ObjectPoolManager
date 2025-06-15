@@ -62,6 +62,31 @@ namespace CustomObjectPool
         }
         #endregion
 
+        #region Unregister
+        // Unregister a pool from a poolObject.
+        public static bool UnRegisterPool<T, N>(T poolObj, ObjectPooler<N> pooler)
+        where T : class
+        {
+            if (_poolingObjects.TryGetValue(typeof(T), out var poolMap))
+            {
+                bool result = poolMap.Remove(typeof(N));
+                if (poolMap.Count == 0)
+                {
+                    return _poolObjContainer.Remove(typeof(T)) && result;
+                }
+                return result;
+            }
+            return false;
+        }
+
+        // Clear poolObject.
+        public static bool RemovePoolObject<T>(T poolObj)
+        where T : class
+        {
+            return _poolingObjects.Remove(typeof(T)) && _poolObjContainer.Remove(typeof(T));
+        }
+        #endregion
+
         #region Return to pool
         public static N ReturnToPool<T, N>(N obj)
         where T : class
